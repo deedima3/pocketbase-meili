@@ -1,20 +1,21 @@
-FROM alpine:3 as downloader
+FROM golang
 
-ARG TARGETOS
-ARG TARGETARCH
-ARG TARGETVARIANT
-ARG VERSION
+WORKDIR /pb
 
-ENV BUILDX_ARCH="${TARGETOS:-linux}_${TARGETARCH:-amd64}${TARGETVARIANT}"
+RUN go env -w GOCACHE=/go-cache
 
-RUN wget https://github.com/pocketbase/pocketbase/releases/download/v${VERSION}/pocketbase_${VERSION}_${BUILDX_ARCH}.zip \
-    && unzip pocketbase_${VERSION}_${BUILDX_ARCH}.zip \
-    && chmod +x /pocketbase
+RUN go env -w GOMODCACHE=/gomod-cache
 
-FROM alpine:3
-RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+COPY go.mod go.sum ./
 
-EXPOSE 8090
+RUN --mount=type=cache,target=/gomod-cache
 
-COPY --from=downloader /pocketbase /usr/local/bin/pocketbase
-ENTRYPOINT ["/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb_data", "--publicDir=/pb_public", "--hooksDir=/pb_hooks"]
+RUN go mod download
+
+COPY *.go ./
+
+RUN --mount=type=cache,target=/gomod-cache --mount=type=cache,target=/go-cache
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /pocketbase
+
+CMD ["/pocketbase", "serve", "--http=0.0.0.0:8090"]

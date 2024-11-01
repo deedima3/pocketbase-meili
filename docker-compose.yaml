@@ -1,15 +1,13 @@
-version: "3.7"
 services:
   pocketbase:
-    build:
-      context: .
-      args:
-        - VERSION=0.22.10 # <--------- Set the Pocketbase version here. It will be downloaded from their GitHub repo
+    build: .
     container_name: pocketbase
     restart: unless-stopped
     environment:
-      - MEILI_MASTER_KEY="${MEILI_MASTER_KEY}""
-      - MEILI_HOST="${MEILI_HOST}"
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_HOST=http://meilisearch:7700
+      - TARGETOS="linux"
+      - TARGETARCH="x86"
     ports:
       - "${POCKETBASE_EXPOSED_PORT}:8090"
     volumes:
@@ -21,13 +19,23 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - pocketbase-meili-net
   meilisearch:
     stdin_open: true
     tty: true
     ports:
       - ${MEILI_EXPOSED_PORT}:7700
     environment:
-      - MEILI_MASTER_KEY="${MEILI_MASTER_KEY}""
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_NO_ANALYTICS=${MEILI_NO_ANALYTICS}
     volumes:
       - ${MEILI_DATA_PATH}:/meili_data
     image: getmeili/meilisearch:v1.10
+    networks:
+      - pocketbase-meili-net
+
+networks:
+  pocketbase-meili-net:
+    name: pocketbase-meili-net
+    driver: bridge
