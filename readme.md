@@ -1,0 +1,13 @@
+Example ENV file
+```
+MEILI_MASTER_KEY=""
+MEILI_NO_ANALYTICS=true
+MEILI_EXPOSED_PORT=""
+MEILI_DATA_PATH=""
+POCKETBASE_EXPOSED_PORT=""
+PATH_TO_DATA=""
+PATH_TO_PUBLIC=""
+PATH_TO_HOOK=""
+```
+
+You can run directly with docker-compose
