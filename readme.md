@@ -8,6 +8,7 @@ POCKETBASE_EXPOSED_PORT=""
 PATH_TO_DATA=""
 PATH_TO_PUBLIC=""
 PATH_TO_HOOK=""
+INDEXED_COLLECTION=""
 ```
 
 You can run directly with docker-compose

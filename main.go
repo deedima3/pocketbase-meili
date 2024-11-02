@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/meilisearch/meilisearch-go"
 	"github.com/pocketbase/pocketbase"
@@ -14,22 +15,23 @@ import (
 	"github.com/pocketbase/pocketbase/models"
 )
 
-var indexableCollections = []string{"service", "blog", "transport", "villa"}
+var indexableCollections = os.Getenv("INDEXED_COLLECTION")
+var splitIndexableCollections = strings.Split(indexableCollections, "")
 var host = os.Getenv("MEILI_HOST")
 var master_key = os.Getenv("MEILI_MASTER_KEY")
 
 var client = meilisearch.New(host, meilisearch.WithAPIKey(master_key))
 
 func RegisterMeiliHooks(app *pocketbase.PocketBase) {
-	app.OnRecordAfterCreateRequest(indexableCollections...).Add(func(e *core.RecordCreateEvent) error {
+	app.OnRecordAfterCreateRequest(splitIndexableCollections...).Add(func(e *core.RecordCreateEvent) error {
 		go createOrUpdateMeiliDocument(e.Record, app)
 		return nil
 	})
-	app.OnRecordAfterUpdateRequest(indexableCollections...).Add(func(e *core.RecordUpdateEvent) error {
+	app.OnRecordAfterUpdateRequest(splitIndexableCollections...).Add(func(e *core.RecordUpdateEvent) error {
 		go createOrUpdateMeiliDocument(e.Record, app)
 		return nil
 	})
-	app.OnRecordAfterDeleteRequest(indexableCollections...).Add(func(e *core.RecordDeleteEvent) error {
+	app.OnRecordAfterDeleteRequest(splitIndexableCollections...).Add(func(e *core.RecordDeleteEvent) error {
 		go deleteMeiliDocument(e.Record, app)
 		return nil
 	})
