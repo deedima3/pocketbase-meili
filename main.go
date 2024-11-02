@@ -16,7 +16,7 @@ import (
 )
 
 var indexableCollections = os.Getenv("INDEXED_COLLECTION")
-var splitIndexableCollections = strings.Split(indexableCollections, "")
+var splitIndexableCollections = strings.Split(indexableCollections, ",")
 var host = os.Getenv("MEILI_HOST")
 var master_key = os.Getenv("MEILI_MASTER_KEY")
 
