@@ -6,6 +6,7 @@ services:
     environment:
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
       - MEILI_HOST=http://meilisearch:7700
+      - INDEXED_COLLECTION=${INDEXED_COLLECTION}
       - TARGETOS="linux"
       - TARGETARCH="x86"
     ports:
